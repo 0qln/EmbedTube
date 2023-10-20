@@ -1,8 +1,8 @@
-function closeVideo(tabid) {
+function closeVideo(tabid, url) {
   chrome.tabs.remove(tabid, function() { });
 }
 
-function shouldExtractVideoID(url) {
+function isDefaultVideoplayer(url) {
   return String(url).includes("youtube.com/watch?v=");
 }
 
@@ -35,16 +35,16 @@ function createEmbedURL(videoID) {
 }
 
 function processVideo(tabid, url) {
-  if (!shouldExtractVideoID(url))
-    return;
-  
-  closeVideo(tabid);
-  chrome.tabs.create({ url: createEmbedURL(getVideoID(url)) });
+  if (isDefaultVideoplayer(url)) {
+    closeVideo(tabid, url);
+    let newUrl = createEmbedURL(getVideoID(url));
+    chrome.tabs.create({ url: newUrl });
+  }  
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (!changeInfo.url) return;      
-  processVideo(tabs[0].id, changeInfo.url);
+  processVideo(tab.id, changeInfo.url);
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
