@@ -1,0 +1,39 @@
+body {
+    background-color: #292a2d;
+    width: 250px;
+    text-align: center;
+}
+
+.container {
+    color: #e8eaed;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+h1 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.infoText {
+    color: #e8eaed;
+    font-size: 14px;
+    text-align: center;
+}
+
+
+.listHeader {
+    color: #e8eaed;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+.listOption {
+    color: #e8eaed;
+    font-size: 14px;
+    text-align: left;
+    align-self: left;
+}

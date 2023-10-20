@@ -34,39 +34,25 @@ function createEmbedURL(videoID) {
   return "https://www.youtube.com/embed/" + videoID;
 }
 
-function processVideo(tabid, videoID) {
-    // pause the video
-    closeVideo(tabid);
-
-    // open embedded video
-    chrome.tabs.create({ url: createEmbedURL(videoID) });
+function processVideo(tabid, url) {
+  if (!shouldExtractVideoID(url))
+    return;
+  
+  closeVideo(tabid);
+  chrome.tabs.create({ url: createEmbedURL(getVideoID(url)) });
 }
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-  if (!changeInfo.url) return;
-
-  let activeTabUrl = changeInfo.url;
-  console.log("New URL: " + activeTabUrl);
-  
-  if (shouldExtractVideoID(activeTabUrl)) {
-    videoID = getVideoID(activeTabUrl);
-    processVideo(tab.id, videoID);
-  }
+  if (!changeInfo.url) return;      
+  processVideo(tabs[0].id, changeInfo.url);
 });
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "tabUpdate") {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       if (!tabs[0]) return;
-
-      let activeTabUrl = tabs[0].url;
-      console.log("New URL: " + activeTabUrl);
-      
-      if (shouldExtractVideoID(activeTabUrl)) {
-        videoID = getVideoID(activeTabUrl);        
-        processVideo(tabs[0].id, videoID);
-      }
-      
+      processVideo(tabs[0].id, tabs[0].url);
     });
   }
 });
+
