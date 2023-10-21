@@ -3,9 +3,12 @@ function closeVideo(tabid, url) {
 }
 
 function isDefaultVideoplayer(url) {
+  console.log("isDefaultVideoplayer");
+  
   const regex = /(https:\/\/www.youtube.com\/watch\?v=)/gm;
   
   let m;
+  let ret = false;
   while ((m = regex.exec(url)) !== null) {
     // This is necessary to avoid infinite loops with zero-width matches
     if (m.index === regex.lastIndex) {
@@ -13,14 +16,18 @@ function isDefaultVideoplayer(url) {
     }
 
     m.forEach((match, groupIndex) => {
-      return true;
+      console.log(`Found match, group ${groupIndex}: ${match}`);
+      ret = true;
     });
   }
   
-  return false;
+  console.log(ret);
+  return ret;
 }
 
 function getVideoID(url) {
+  console.log("getVideoID");
+
   const regex = /(https:\/\/www\.youtube\.com\/watch\?v=)|(\&t*\S*)/gm;  
   
   // example input: 
