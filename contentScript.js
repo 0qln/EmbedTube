@@ -1,2 +1,5 @@
 
-chrome.runtime.sendMessage({ action: "tabUpdate" });
+
+
+chrome.runtime.sendMessage({ action: "youtubeTabUpdate" });
+

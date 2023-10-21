@@ -4,6 +4,10 @@ body {
     text-align: center;
 }
 
+hr {
+  width:100%;
+}
+
 .container {
     color: #e8eaed;
     display: flex;
@@ -37,3 +41,79 @@ h1 {
     text-align: left;
     align-self: left;
 }
+
+.switch-container {
+  display: flex;
+  align-items: center;
+}
+
+#switchInfo {
+  margin-right: 10px;
+}
+
+.switch-label {
+  margin-right: 10px; /* Adjust the margin as needed to control the spacing */
+}
+
+.switch {
+    display: inline-block;
+    position: relative;
+    width: 30px;
+    height: 15px;
+  }
+  
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 30px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 11px;
+    width: 11px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: #2196F3;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(15px);
+    -ms-transform: translateX(15px);
+    transform: translateX(15px);
+  }
+  
+  .slider.round {
+    border-radius: 15px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+  
