@@ -16,13 +16,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         document.getElementById('blacklist').appendChild(vid);
     }
 
-    async function updateBlackListSwitch() {
-        toggle.checked = false;
+    async function initiateBlackListSwitch() {
         await chrome.storage.local.get(null).then(async result => {
             for (var key in result) {
-                if (getVideoID(result) === await getCurrentTab().url && 
-                    result[key]) 
+                if (key === getVideoID((await getLastValidTab()).url) && result[key]) {
                     toggle.checked = true;
+                }
             }
         })
     }
@@ -38,6 +37,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             await clearBlacklist();
 
             for (var key in result) {
+                if (key === "LAST_VALID_TAB")
+                    continue;
+
                 if (result[key]) {
                     listVideo(key);
                 } 
@@ -45,20 +47,21 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
     
-    updateBlackListSwitch();
+    initiateBlackListSwitch();
     updateBlackList();
     
     chrome.storage.onChanged.addListener(updateBlackList);
 });
 
 
-
-async function getCurrentTab() {
-    let queryOptions = { active: true, lastFocusedWindow: true };
-    // `tab` will either be a `tabs.Tab` instance or `undefined`.
-    let [tab] = await chrome.tabs.query(queryOptions);
-    return tab;
+async function getLastValidTab() {
+    let result;
+    await chrome.storage.local.get(["LAST_VALID_TAB"]).then(data => {
+        result = data.LAST_VALID_TAB;
+    });
+    return result;
 }
+
 
 function getVideoID(url) {
     const regex = /((?<defaultVideoPlayer>https:\/\/www\.youtube\.com\/watch\?v=)|(?<defaultVideoTrailings>\&t*\S*))|((?<embedVideoPlayer>https:\/\/www\.youtube\.com\/embed\/)|(?<OccaisonalEmbedVideoTrailings>\?si=*\S*))/gm;  

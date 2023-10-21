@@ -65,7 +65,7 @@ async function processVideo(tabid, url) {
 chrome.runtime.onMessage.addListener(async function(request) {  
   if (request.action.includes("blacklist")) {    
     let enabled = request.action.includes("true");
-    let vid = await getVideoID(currentTab.url);
+    let vid = await getVideoID((await getLastValidTab()).url);
     if (!vid) return;
 
     if (enabled) {
@@ -97,13 +97,19 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
 chrome.tabs.onUpdated.addListener(onTabUpdate);
 chrome.tabs.onActivated.addListener(onTabUpdate);
 
-let currentTab; // this should not be `undefined`.
+async function getLastValidTab() {
+  let result;
+  await chrome.storage.local.get(["LAST_VALID_TAB"]).then(data => {
+    result = data.LAST_VALID_TAB;
+  });
+  return result;
+}
 async function onTabUpdate() {
 
   let tab = await getCurrentTab();
   if (tab && tab.url) {
-    currentTab = tab;
-    console.log(currentTab.url);
+    await chrome.storage.local.set({LAST_VALID_TAB:tab});
+    console.log((await getLastValidTab()).url);
   }
 
   if (tab.url === undefined) throw new TypeError("`currentTab` is undefined!");
