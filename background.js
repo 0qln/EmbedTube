@@ -3,7 +3,21 @@ function closeVideo(tabid, url) {
 }
 
 function isDefaultVideoplayer(url) {
-  return String(url).includes("youtube.com/watch?v=");
+  const regex = /(https:\/\/www.youtube.com\/watch\?v=)/gm;
+  
+  let m;
+  while ((m = regex.exec(url)) !== null) {
+    // This is necessary to avoid infinite loops with zero-width matches
+    if (m.index === regex.lastIndex) {
+      regex.lastIndex++;
+    }
+
+    m.forEach((match, groupIndex) => {
+      return true;
+    });
+  }
+  
+  return false;
 }
 
 function getVideoID(url) {
@@ -37,10 +51,11 @@ function createEmbedURL(videoID) {
 function processVideo(tabid, url) {
   if (isDefaultVideoplayer(url)) {
     closeVideo(tabid, url);
-    let newUrl = createEmbedURL(getVideoID(url));
-    chrome.tabs.create({ url: newUrl });
-  }  
+    let playerUrl = createEmbedURL(getVideoID(url));
+    chrome.tabs.create({ url: playerUrl });
+  }
 }
+
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (!changeInfo.url) return;      

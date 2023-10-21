@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "description": "Open youtube videos with an embedding player",
   "permissions": ["storage", "tabs", "activeTab", "scripting"],
-  "host_permissions": ["https://*.youtube.com/*"],
+  "host_permissions": ["https://youtube.com/*"],
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.youtube.com/*"],
+      "matches": ["https://youtube.com/*"],
       "js": ["contentScript.js"]
     }
   ],
@@ -21,7 +21,7 @@
         "assets/delete.png",
         "assets/save.png"
       ],
-      "matches": ["https://*.youtube.com/*"]
+      "matches": ["https://youtube.com/*"]
     }
   ],
   "action": {
