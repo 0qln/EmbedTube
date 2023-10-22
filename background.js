@@ -27,7 +27,7 @@ async function embedPlayer(tabid, url) {
 
   try {
     // we have to go back first, as youtube openend to site faster than us
-    await chrome.tabs.goBack(); 
+    await chrome.tabs.goBack(tabid); 
   }
   catch (e) { 
     //oh noo, anyways...
