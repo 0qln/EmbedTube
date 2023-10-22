@@ -8,12 +8,14 @@ async function addBlacklistEntry(url) {
 }
 async function initiateBlacklistSwitch() {
     const blacklistSwitch = document.getElementById('blacklistSwitch');
+    let enable = false;
     await chrome.storage.local.get(null).then(async result => {
         for (var key in result) {
             if (key === getVideoID((await getCurrentTab()).url) && result[key]) 
-                blacklistSwitch.checked = true;                
+                enable = true;                
         }
     })
+    blacklistSwitch.checked = enable;
 }
 async function clearBlacklist() {
     let list = document.getElementById('blacklist');
@@ -41,6 +43,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     blacklistSwitch.addEventListener("click", async function(event) {
         if (event.target.id === "blacklistSwitch") {            
             chrome.runtime.sendMessage({ action:"blacklist" + String(blacklistSwitch.checked) });
+        }
+    });
+    const clearAllButton = document.getElementById('clearAllButton');
+    clearAllButton.addEventListener("click", async function(event) {
+        if (event.target.id === "clearAllButton") {            
+            await chrome.storage.local.clear();
+            initiateBlacklistSwitch();
         }
     });
 

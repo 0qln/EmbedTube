@@ -1,6 +1,6 @@
 body {
-    background-color: #292a2d;
-    width: 250px;
+    background-color: #202124;
+    width: 300px;
     text-align: center;
 }
 
@@ -115,5 +115,19 @@ h1 {
   
   .slider.round:before {
     border-radius: 50%;
+  }
+  
+  button#clearAllButton {
+      background-color: #4b4d53;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 10px;
+  }
+  
+  button#clearAllButton:hover {
+      background-color: #292a2d;
   }
   
