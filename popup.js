@@ -7,10 +7,11 @@ async function addBlacklistEntry(url) {
     document.getElementById('blacklist').appendChild(vid);
 }
 async function initiateBlacklistSwitch() {
+    const blacklistSwitch = document.getElementById('blacklistSwitch');
     await chrome.storage.local.get(null).then(async result => {
         for (var key in result) {
             if (key === getVideoID((await getCurrentTab()).url) && result[key]) 
-                toggle.checked = true;                
+                blacklistSwitch.checked = true;                
         }
     })
 }

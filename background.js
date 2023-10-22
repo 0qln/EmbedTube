@@ -21,11 +21,15 @@ function createEmbedURL(videoID) {
   return "https://www.youtube.com/embed/" + videoID;
 }
 
-async function processVideo(tabid, url) { 
+
+async function embedPlayer(tabid, url) { 
   if (!isDefaultVideoplayer(url) || await isBlacklisted(url)) return;
-  chrome.tabs.remove(tabid);
+
+  // we have to go back first, as youtube openend to site faster than us
+  await chrome.tabs.goBack(); 
+  // then switch to the embed player
   let playerUrl = createEmbedURL(getVideoID(url));
-  chrome.tabs.create({ url: playerUrl });
+  await chrome.tabs.update(tabid, { url:playerUrl });
 }
 
 async function isBlacklisted(url) {
@@ -39,6 +43,17 @@ async function isBlacklisted(url) {
   });
   return output;
 }
+
+chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
+  if (request.action === "openInYoutube") {
+
+    let tab = sender.tab;
+    if (!tab) return;
+
+    let vid = getVideoID(tab.url); 
+    await chrome.storage.local.set({[vid]:true});
+  }
+});
 
 chrome.runtime.onMessage.addListener(async function(request) {  
   if (request.action.includes("blacklist")) {    
@@ -57,14 +72,14 @@ chrome.runtime.onMessage.addListener(async function(request) {
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
   if (!changeInfo.url) return;      
   console.assert(changeInfo.url);
-  processVideo(tab.id, changeInfo.url);
+  embedPlayer(tab.id, changeInfo.url);
 });
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
   if (request.action === "youtubeTabUpdate") {
     let tab = await getCurrentTab();
     if (!tab || !tab.url) return;
-    processVideo(tab.id, tab.url);
+    embedPlayer(tab.id, tab.url);
   }
 });
 
