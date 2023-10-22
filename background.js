@@ -25,11 +25,18 @@ function createEmbedURL(videoID) {
 async function embedPlayer(tabid, url) { 
   if (!isDefaultVideoplayer(url) || await isBlacklisted(url)) return;
 
-  // we have to go back first, as youtube openend to site faster than us
-  await chrome.tabs.goBack(); 
-  // then switch to the embed player
-  let playerUrl = createEmbedURL(getVideoID(url));
-  await chrome.tabs.update(tabid, { url:playerUrl });
+  try {
+    // we have to go back first, as youtube openend to site faster than us
+    await chrome.tabs.goBack(); 
+  }
+  catch (e) { 
+    //oh noo, anyways...
+  } 
+  finally {
+    // then switch to the embed player
+    let playerUrl = createEmbedURL(getVideoID(url));
+    await chrome.tabs.update(tabid, { url:playerUrl });
+  }
 }
 
 async function isBlacklisted(url) {
