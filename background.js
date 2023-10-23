@@ -1,4 +1,3 @@
-
 function isDefaultVideoplayer(url) {
   return /https:\/\/www\.youtube\.com\/watch\?v=/gm.test(url);
 }
@@ -22,7 +21,7 @@ function createEmbedURL(videoID) {
 }
 
 
-async function embedPlayer(tabid, url) { 
+async function embedPlayer(tabid, url, autoplay) { 
   if (!isDefaultVideoplayer(url) || await isBlacklisted(url)) return;
 
   try {
@@ -36,14 +35,15 @@ async function embedPlayer(tabid, url) {
     // then switch to the embed player
     let playerUrl = createEmbedURL(getVideoID(url));
     await chrome.tabs.update(tabid, { url:playerUrl });
+    // handle autoplay
   }
 }
 
 async function isBlacklisted(url) {
   var output = false;
-  await chrome.storage.local.get(null).then(result => {
+  await chrome.storage.local.get().then(result => {
     for (var key in result) 
-      if (key === getVideoID(url) && result[key]) {
+      if (key === getVideoID(url) && result[key] && key.includes("blacklist_")) {
         output = true;
         return;
       }    
@@ -57,22 +57,25 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
     let tab = sender.tab;
     if (!tab) return;
 
-    let vid = getVideoID(tab.url); 
+    let vid = "blacklist_"+getVideoID(tab.url); 
     await chrome.storage.local.set({[vid]:true});
   }
 });
 
 chrome.runtime.onMessage.addListener(async function(request) {  
   if (request.action.includes("blacklist")) {    
+    console.log(request.action);
     let enabled = request.action.includes("true");
     let tab = await getCurrentTab();
     if (!tab || !tab.url) return;
 
-    let vid = getVideoID(tab.url); 
+    let vid = "blacklist_"+getVideoID(tab.url); 
     console.assert(vid);
 
     if (enabled) await chrome.storage.local.set   ({[vid]:true});
     else         await chrome.storage.local.remove( [vid]);    
+
+    await printStorage("blacklist_");
   }
 });
 
@@ -103,9 +106,11 @@ async function getCurrentTab() {
   return tab;
 }
 
-async function printStorage() {
+async function printStorage(arg) {
   chrome.storage.local.get(null).then(result => {
     for (var key in result) 
-      console.log(key + ": " + result[key]);
+      if (key.includes(arg)) {
+        console.log(key + ": " + result[key]);
+      }
   });
 }

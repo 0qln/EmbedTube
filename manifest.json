@@ -1,6 +1,6 @@
 {
   "name": "Embed Tube",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Open youtube videos with an embedding player",
   "permissions": ["storage", "tabs", "activeTab", "scripting", "background"],
   "host_permissions": ["https://www.youtube.com/*"],
@@ -14,7 +14,8 @@
     },
     {
       "matches": ["https://www.youtube.com/embed/*"],
-      "js": ["embedSite.js"]
+      "js": ["embedSite.js"],
+      "run_at": "document_start"
     },
     {
       "matches": ["<all_urls>"],

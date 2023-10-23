@@ -1,9 +1,7 @@
-
-
-async function addBlacklistEntry(url) {
+async function addBlacklistEntry(vidid) {
     let vid = document.createElement('li');
     vid.className = "listOption";
-    vid.innerText = url;
+    vid.innerText = String(vidid).slice("blacklist_".length);
     document.getElementById('blacklist').appendChild(vid);
 }
 async function initiateBlacklistSwitch() {
@@ -11,28 +9,47 @@ async function initiateBlacklistSwitch() {
     let enable = false;
     await chrome.storage.local.get(null).then(async result => {
         for (var key in result) {
-            if (key === getVideoID((await getCurrentTab()).url) && result[key]) 
+            if (key === getVideoID((await getCurrentTab()).url && key.includes("blacklist_")) && result[key]) 
                 enable = true;                
         }
     })
     blacklistSwitch.checked = enable;
 }
-async function clearBlacklist() {
+async function initiateAutoPlaySwitch() {
+    const autoplaySwitch = document.getElementById('autoPlaySwitch');
+    let enable = false;
+    await chrome.storage.local.get(null).then(async result => {
+        for (var key in result) {
+            if (key === "settings_doAutoPlay" && result[key]) 
+                enable = true;                
+        }
+    })
+    autoplaySwitch.checked = enable;
+}
+async function clearBlacklistGui() {
     let list = document.getElementById('blacklist');
     while ((list.firstChild)) {
         list.removeChild(list.firstChild);
     }
 }
 async function updateBlacklist() {
-    await clearBlacklist();
+    await clearBlacklistGui();
     await fillBlacklist();
 }
 async function fillBlacklist() {
     await chrome.storage.local.get(null).then(async result => {
         for (var key in result) {
-            if (result[key]) {
+            console.log(key);
+            if (result[key] && key.includes("blacklist_")) {
                 addBlacklistEntry(key);
             } 
+        }
+    });
+}
+async function clearBlacklist() {
+    await chrome.storage.local.get(null).then(async result => {
+        for (var key in result) {
+            if (key.includes("blacklist_")) chrome.storage.local.remove([key]); 
         }
     });
 }
@@ -48,14 +65,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     const clearAllButton = document.getElementById('clearAllButton');
     clearAllButton.addEventListener("click", async function(event) {
         if (event.target.id === "clearAllButton") {            
-            await chrome.storage.local.clear();
+            await clearBlacklist();
             initiateBlacklistSwitch();
+        }
+    });
+    const autoplaySwitch = document.getElementById('autoPlaySwitch');
+    autoplaySwitch.addEventListener("click", async function(event) {
+        if (event.target.id === "autoPlaySwitch") {
+            await chrome.storage.local.set({"settings_doAutoPlay":autoplaySwitch.checked});
         }
     });
 
     chrome.storage.onChanged.addListener(updateBlacklist);
     
     initiateBlacklistSwitch();
+    initiateAutoPlaySwitch();
     updateBlacklist();
 });
 
