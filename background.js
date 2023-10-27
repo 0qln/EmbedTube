@@ -1,4 +1,4 @@
-import { isAnyYT, isVideo } from './utils.js'
+import { createWatchURL, isAnyYT, isVideo } from './utils.js'
 import { isPlaylistPlayer } from './utils.js';
 import { extractPlaylistID } from './utils.js'
 import { extractVideoID } from './utils.js';
@@ -6,13 +6,19 @@ import { hasPlaylistID } from './utils.js'
 import { getCurrentTab } from './utils.js';
 import { createEmbedURL } from './utils.js';
 import { Content } from './types.js';
+import { getBlacklisted } from './blacklist.js';
+import { setBlacklisted } from './blacklist.js';
+import { initBlacklist } from './blacklist.js';
+
 
 
 // main code
-(() => {
+(async () => {
+
+    await initBlacklist();
 
     initiateUrlDetection();
-
+    
 })();
 
 
@@ -22,9 +28,18 @@ async function initiateUrlDetection() {
         if (message.command === "MANAGE_ME") {
 
             console.log(message);
+            let videoId = extractVideoID(sender.tab.url);
             
-            if (message.content === Content.Video) {
-                pushToEmbed(sender.tab);
+            if (message.content === Content.Video &&
+                await getBlacklisted(videoId) === false) {
+                switchPlayer(sender.tab, createEmbedURL);
+            }
+            else if (
+                message.content === Content.Embed &&
+                message.playable === false) {
+                await setBlacklisted(videoId, true);
+                switchPlayer(sender.tab, createWatchURL);
+                // TODO: show some kind of popup to notify the user
             }
         }
     });
@@ -47,25 +62,22 @@ async function initiateUrlDetection() {
     });
 }
 
-async function pushToEmbed(tab) {
-    
+async function switchPlayer(tab, urlCreator) {
     const url = tab.url;
-    
     try {
-        // we have to go back first, as youtube openend the site faster than us
+        // we have to go back first
         await chrome.tabs.goBack(tab.id); 
     }
     catch (e) { 
         //oh noo, anyways...
     } 
     finally {
-        // then switch to the embed player
-        await new Promise(r => setTimeout(r, 200));
-
-        const playerUrl = createEmbedURL(extractVideoID(url));
+        // then switch to the other player
+        const playerUrl = urlCreator(extractVideoID(url));
         await chrome.tabs.update(tab.id, { url:playerUrl });
     }
 }
+
 
 
 // testing

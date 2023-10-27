@@ -4,7 +4,7 @@
     const types = await import(chrome.runtime.getURL('types.js'));
     
     
-    var platform, content, url, tab;
+    var platform, content, url;
 
     async function update() {
         url = location.href;
@@ -19,7 +19,11 @@
                  : utils.isMusic(url) ? types.Platform.Music
                  : types.Platform.Other;
         
-        chrome.runtime.sendMessage( { command:"MANAGE_ME", platform:platform, content:content } );
+        chrome.runtime.sendMessage({ 
+            command:"MANAGE_ME", 
+            platform:platform, 
+            content:content 
+        });
     }
     
     chrome.runtime.onMessage.addListener(message => {

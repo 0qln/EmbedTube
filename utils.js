@@ -58,6 +58,10 @@ export function extractVideoID(url) {
 export function createEmbedURL(videoID) {
     return "https://www.youtube.com/embed/" + videoID;
 }
+export function createWatchURL(videoID) {
+    return "https://www.youtube.com/watch?v=" + videoID;
+}
+
 
 // Get the current active tab in the lastly focused window
 export async function getCurrentTab() {

@@ -74,6 +74,10 @@
 
   "web_accessible_resources": [{
     "matches": ["<all_urls>"],
-    "resources": ["utils.js", "types.js"]
+    "resources": [
+      "utils.js", 
+      "types.js",
+      "blacklist.js"
+    ]
   }]
 }
