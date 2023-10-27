@@ -1,6 +1,6 @@
 {
   "name": "Embed Tube",
-  "version": "0",
+  "version": "3.0.0",
   "description": "Open youtube videos with an embedding player",
   "permissions": ["storage", "tabs", "activeTab", "scripting", "background", "tabCapture"],
   "host_permissions": ["https://*.youtube.com/*"],
