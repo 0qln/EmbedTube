@@ -1,4 +1,4 @@
-import { createWatchURL, isAnyYT, isVideo } from './utils.js'
+import { createWatchURL, hasVideoID, isAnyYT, isVideo } from './utils.js'
 import { isPlaylistPlayer } from './utils.js';
 import { extractPlaylistID } from './utils.js'
 import { extractVideoID } from './utils.js';
@@ -17,39 +17,70 @@ import { initBlacklist } from './blacklist.js';
 
     await initBlacklist();
     await initiateUrlDetection();
-    
+
+    await test_blacklist();
 })();
 
 
+const msgQueue = [];
+var processing = false;
 // function declerations
 async function initiateUrlDetection() {
-    
+
+    async function process(message, sender) {
+        processing = true;
+
+        const videoId = extractVideoID(message.url);
+
+        if (message.comment === "OPEN_IN_YT") {
+            await setBlacklisted(videoId, true);
+        }
+
+        if (message.comment === "GO_EMBED" && await getBlacklisted(videoId) === false) {
+            await switchPlayer(sender.tab, createEmbedURL);
+        }
+        
+        if (message.comment === "NOT_PLAYABLE") {
+            await setBlacklisted(videoId, true);
+            await switchPlayer(sender.tab, createWatchURL);
+        }       
+
+        // keep processing until there is no more to process
+        while (msgQueue.length > 0) {
+            let parameters = msgQueue.shift();
+            console.log('Message processed from stack: ');
+            console.log({ parameters:parameters.message, sender:parameters.sender});
+            await process(parameters.message, parameters.sender);
+        }
+
+        // only now signal that we stopped processing, so 
+        // that messages coming in while processing get pushed
+        // on the queue
+        processing = false;
+    }
+
     // On request, manage the tab according to it's content and platform
     chrome.runtime.onMessage.addListener(async (message, sender) => {
         if (message.command === "MANAGE_ME") {
-
-            console.log(message);
-            let videoId = extractVideoID(sender.tab.url);
-            
-            if (message.content === Content.Video &&
-                await getBlacklisted(videoId) === false) {
-                switchPlayer(sender.tab, createEmbedURL);
+            if (processing) {
+                console.log('Message pushed to stack: ');
+                console.log({ message:message, sender:sender});
+                msgQueue.push({ message:message, sender:sender});
             }
-            else if (
-                message.content === Content.Embed &&
-                message.playable === false) {
-                await setBlacklisted(videoId, true);
-                switchPlayer(sender.tab, createWatchURL);
-                // TODO: show some kind of popup to notify the user
-            }
+            else {
+                console.log('Message processed immediatly: ');
+                console.log({ message:message, sender:sender});
+                process(message, sender);
+            }            
         }
     });
+    
 
     // Notify a tab when it's URL changed
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         if (changeInfo.url && isAnyYT(changeInfo.url)) {
             try {
-                await chrome.tabs.sendMessage(tabId, { command:"FORCE_UPDATE_URL" });
+                await chrome.tabs.sendMessage(tabId, { command: "FORCE_UPDATE_URL" });
             }
             catch (e) {
                 if (String(e) === "Error: Could not establish connection. Receiving end does not exist.") {
@@ -58,7 +89,7 @@ async function initiateUrlDetection() {
                 }
                 else {
                     // this is an unknown error
-                    throw(e);
+                    throw (e);
                 }
             }
         }
@@ -69,15 +100,15 @@ async function switchPlayer(tab, urlCreator) {
     const url = tab.url;
     try {
         // we have to go back first
-        await chrome.tabs.goBack(tab.id); 
+        await chrome.tabs.goBack(tab.id);
     }
-    catch (e) { 
+    catch (e) {
         //oh noo, anyways...
-    } 
+    }
     finally {
         // then switch to the other player
         const playerUrl = urlCreator(extractVideoID(url));
-        await chrome.tabs.update(tab.id, { url:playerUrl });
+        await chrome.tabs.update(tab.id, { url: playerUrl });
     }
 }
 
@@ -89,13 +120,13 @@ async function test_blacklist() {
     console.log("START test_blacklist");
 
     await setBlacklisted('testId', true);
-    let result = getBlacklisted('testId');
+    let result = await getBlacklisted('testId');
 
-    console.log(result === true 
-        ? "Blacklist test succesful." 
-        : "Blacklist test failed.\n " + 
-            "Result: " + result +
-            "Expected result: " + true);
+    console.log(result === true
+        ? "Blacklist test succesful."
+        : "Blacklist test failed." +
+        "\nResult: " + result +
+        "\nExpected result: " + true);
 
     console.log("EXIT test_contentScripts");
 }
@@ -103,7 +134,7 @@ async function test_blacklist() {
 async function test_contentScripts() {
     console.log("START test_contentScripts");
 
-    const data = { };
+    const data = {};
     let dataFinished = 0;
     let dataCount = 0;
     let tabs = [];
@@ -122,6 +153,9 @@ async function test_contentScripts() {
     data.embed = {
         video: "https://www.youtube.com/embed/Qd7QY_7jaOc",
     };
+    data.rare = {
+        url: "https://www.youtube.com/watch?v=BQhJCS5IaaY&source_ve_path=Mjg2NjY&feature=emb_logo"
+    }
 
     console.log("TESTING_DATA: ");
     console.log(data);
@@ -132,17 +166,17 @@ async function test_contentScripts() {
             dataFinished++;
         }
     });
-    
+
     for (var platform in data) {
         for (var site in data[platform]) {
-            let url = data[platform][site];                    
-            chrome.tabs.create({url: url}, tab => tabs.push(tab));
+            let url = data[platform][site];
+            chrome.tabs.create({ url: url }, tab => tabs.push(tab));
             dataCount++;
         }
     }
 
     while (dataFinished < dataCount) {
-        await new Promise(r => setTimeout(r, 100));    
+        await new Promise(r => setTimeout(r, 100));
         console.log("PROGRESS " + dataFinished + " / " + dataCount);
     }
     for (var tab in tabs) {

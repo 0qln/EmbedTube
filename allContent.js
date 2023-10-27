@@ -19,11 +19,9 @@
                  : utils.isMusic(url) ? types.Platform.Music
                  : types.Platform.Other;
         
-        chrome.runtime.sendMessage({ 
-            command:"MANAGE_ME", 
-            platform:platform, 
-            content:content 
-        });
+        let comment = content === types.Content.Video ? "GO_EMBED" : "";
+        
+        utils.MANAGE_ME(comment, content, platform, url);
     }
     
     chrome.runtime.onMessage.addListener(message => {

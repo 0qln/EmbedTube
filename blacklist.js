@@ -10,14 +10,13 @@ export async function initBlacklist() {
 
 
 export async function setBlacklisted(videoId, value) {
-    await chrome.storage.local.get("blacklist").then(result => {
+    await chrome.storage.local.get("blacklist").then(async result => {
         // Write value
         result.blacklist[videoId] = value;
 
-        // Important: 
-        // `result` is a copy of the data in storage. Thus we have to
-        // save the data explicitly.
-        chrome.storage.local.set({ "blacklist": result.blacklist });
+        // Important: `result` is a copy of the data in storage. Thus 
+        // we have to save the data explicitly.
+        await chrome.storage.local.set({ "blacklist": result.blacklist });
     });
 }
 
@@ -31,3 +30,4 @@ export async function getBlacklisted(videoId) {
     });
     return output;
 }
+

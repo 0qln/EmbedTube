@@ -49,7 +49,7 @@ export function extractPlaylistID(url) {
     return !result || result.length <= 1 ? null : result[1];
 }
 export function extractVideoID(url) {
-    const regex = /(?:\?v=|embed\/)(?<videoID>[A-Za-z0-9_-]*)/gm;
+    const regex = /(?:\?v=|embed\/|&v=)(?<videoID>[A-Za-z0-9_-]*)/gm;
     const result = regex.exec(url);
     return !result || result.length <= 1 ? null : result[1];
 }
@@ -68,4 +68,15 @@ export async function getCurrentTab() {
     let [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
     console.assert(tab);
     return tab;
+}
+
+// using this so the masseges, when printed have a uniform order of properties
+export async function MANAGE_ME(comment, content, platform, url) {
+    chrome.runtime.sendMessage({ 
+        command: "MANAGE_ME", 
+        comment: comment,
+        content: content,
+        platform: platform, 
+        url: url
+    });
 }
