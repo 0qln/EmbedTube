@@ -1,26 +1,65 @@
 {
   "name": "Embed Tube",
-  "version": "2.4.0",
+  "version": "0",
   "description": "Open youtube videos with an embedding player",
-  "permissions": ["storage", "tabs", "activeTab", "scripting", "background"],
-  "host_permissions": ["https://www.youtube.com/*"],
+  "permissions": ["storage", "tabs", "activeTab", "scripting", "background", "tabCapture"],
+  "host_permissions": ["https://*.youtube.com/*"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
+  "minimum_chrome_version": "92",
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["contentScript.js"]
-    },
-    {
-      "matches": ["https://www.youtube.com/embed/*"],
-      "js": ["embedSite.js"],
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["./allContent.js"],
       "run_at": "document_start"
     },
+
+
     {
-      "matches": ["<all_urls>"],
-      "js": ["tabUpdate.js"]
+      "matches": ["https://www.youtube.com/embed/*"],
+      "js": ["./Embed/Video.js"]
+    },
+
+
+    {
+      "matches": ["https://www.youtube.com/"],
+      "js": ["./Youtube/Home.js"]
+    },
+    {
+      "matches": ["https://www.youtube.com/playlist*"],
+      "js": ["./Youtube/Playlist.js"]
+    },
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "exclude_matches": ["https://www.youtube.com/watch*&list=*"],
+      "js": ["./Youtube/Video.js"]
+    },
+    {
+      "matches": ["https://www.youtube.com/watch*&list=*"],
+      "js": ["./Youtube/PlaylistPlayer.js"]
+    },
+
+
+    {
+      "matches": ["https://music.youtube.com/"],
+      "js": ["./YoutubeMusic/Home.js"]
+    },
+    {
+      "matches": ["https://music.youtube.com/playlist*"],
+      "js": ["./YoutubeMusic/Playlist.js"]
+    },
+    {
+      "matches": ["https://music.youtube.com/watch*"],
+      "exclude_matches": ["https://music.youtube.com/watch*&list=*"],
+      "js": ["./YoutubeMusic/Video.js"]
+    },
+    {
+      "matches": ["https://music.youtube.com/watch*&list=*"],
+      "js": ["./YoutubeMusic/PlaylistPlayer.js"]
     }
+
   ],
   "action": {
     "default_icon": {
@@ -29,7 +68,12 @@
       "32": "assets/ext-icon.png"
     },
     "default_title": "Embedded Player",
-    "default_popup": "popup.html"
+    "default_popup": "./Popup/popup.html"
   },
-  "manifest_version": 3
+  "manifest_version": 3,
+
+  "web_accessible_resources": [{
+    "matches": ["<all_urls>"],
+    "resources": ["utils.js", "types.js"]
+  }]
 }

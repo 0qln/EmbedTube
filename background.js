@@ -1,116 +1,122 @@
-function isDefaultVideoplayer(url) {
-  return /https:\/\/www\.youtube\.com\/watch\?v=/gm.test(url);
-}
+import { isAnyYT, isVideo } from './utils.js'
+import { isPlaylistPlayer } from './utils.js';
+import { extractPlaylistID } from './utils.js'
+import { extractVideoID } from './utils.js';
+import { hasPlaylistID } from './utils.js'
+import { getCurrentTab } from './utils.js';
+import { createEmbedURL } from './utils.js';
+import { Content } from './types.js';
 
-function getVideoID(url) {
-  const regex = /(\S*((\?v\=)|(\&v\=)|(embed\/)))|\&=*\S*/gm;
-  let output = String(url), m;
-  while (m = regex.exec(url)) {
-    // This is necessary to avoid infinite loops with zero-width matches
-    regex.lastIndex += m.index === regex.lastIndex ? 1 : 0;
-    
-    m.forEach((match, groupIndex) => {
-      output = output.replace(match, '');
+
+// main code
+(() => {
+
+    initiateUrlDetection();
+
+})();
+
+
+// function declerations
+async function initiateUrlDetection() {
+    chrome.runtime.onMessage.addListener(async (message) => {
+        if (message.command === "MANAGE_ME") {
+
+            console.log(message);
+            
+            if (message.content === Content.Video) {
+                getCurrentTab().then(pushToEmbed);
+            }
+        }
     });
-  }
-  return output;
+    chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+        if (changeInfo.url && isAnyYT(changeInfo.url)) {
+            try {
+                await chrome.tabs.sendMessage(tabId, { command:"FORCE_UPDATE_URL" });
+            }
+            catch (e) {
+                if (String(e) === "Error: Could not establish connection. Receiving end does not exist.") {
+                    // known error; it's fine, the content_script will notify 
+                    // itself as soon as it's loaded
+                }
+                else {
+                    // this is an unknown error
+                    throw(e);
+                }
+            }
+        }
+    });
 }
 
-function createEmbedURL(videoID) {
-  return "https://www.youtube.com/embed/" + videoID;
+async function pushToEmbed(tab) {
+    
+    const url = tab.url;
+    
+    try {
+        // we have to go back first, as youtube openend to site faster than us
+        await chrome.tabs.goBack(tab.id); 
+    }
+    catch (e) { 
+        //oh noo, anyways...
+    } 
+    finally {
+        // then switch to the embed player
+        await new Promise(r => setTimeout(r, 200));
+
+        const playerUrl = createEmbedURL(extractVideoID(url));
+        await chrome.tabs.update(tab.id, { url:playerUrl });
+    }
 }
 
 
-async function embedPlayer(tabid, url, autoplay) { 
-  if (!isDefaultVideoplayer(url) || await isBlacklisted(url)) return;
+// testing
+async function test_contentScripts() {
+    console.log("START test_contentScripts");
 
-  try {
-    // we have to go back first, as youtube openend to site faster than us
-    await chrome.tabs.goBack(tabid); 
-  }
-  catch (e) { 
-    //oh noo, anyways...
-  } 
-  finally {
-    // then switch to the embed player
-    let playerUrl = createEmbedURL(getVideoID(url));
-    await chrome.tabs.update(tabid, { url:playerUrl });
-    // handle autoplay
-  }
+    const data = { };
+    let dataFinished = 0;
+    let dataCount = 0;
+    let tabs = [];
+    data.youtube = {
+        home: "https://www.youtube.com/",
+        playlist: "https://www.youtube.com/playlist?list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ",
+        video: "https://www.youtube.com/watch?v=Qd7QY_7jaOc",
+        playlistPlayer: "https://www.youtube.com/watch?v=Qd7QY_7jaOc&list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ&index=2"
+    };
+    data.youtubeMusic = {
+        home: "https://music.youtube.com/",
+        video: "https://music.youtube.com/watch?v=Qd7QY_7jaOc",
+        playlist: "https://music.youtube.com/playlist?list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ",
+        playlistPlayer: "https://music.youtube.com/watch?v=Qd7QY_7jaOc&list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ&index=2"
+    };
+    data.embed = {
+        video: "https://www.youtube.com/embed/Qd7QY_7jaOc",
+    };
+
+    console.log("TESTING_DATA: ");
+    console.log(data);
+
+    chrome.runtime.onMessage.addListener(message => {
+        if (String(message).includes("CONTENT_SCRIPT_LOADED")) {
+            console.log(message);
+            dataFinished++;
+        }
+    });
+    
+    for (var platform in data) {
+        for (var site in data[platform]) {
+            let url = data[platform][site];                    
+            chrome.tabs.create({url: url}, tab => tabs.push(tab));
+            dataCount++;
+        }
+    }
+
+    while (dataFinished < dataCount) {
+        await new Promise(r => setTimeout(r, 100));    
+        console.log("PROGRESS " + dataFinished + " / " + dataCount);
+    }
+    for (var tab in tabs) {
+        chrome.tabs.remove(tabs[tab].id);
+    }
+    console.log("test_contentScripts SUCCESS");
 }
 
-async function isBlacklisted(url) {
-  var output = false;
-  await chrome.storage.local.get().then(result => {
-    for (var key in result) 
-      if (key === getVideoID(url) && result[key] && key.includes("blacklist_")) {
-        output = true;
-        return;
-      }    
-  });
-  return output;
-}
-
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-  if (request.action === "openInYoutube") {
-
-    let tab = sender.tab;
-    if (!tab) return;
-
-    let vid = "blacklist_"+getVideoID(tab.url); 
-    await chrome.storage.local.set({[vid]:true});
-  }
-});
-
-chrome.runtime.onMessage.addListener(async function(request) {  
-  if (request.action.includes("blacklist")) {    
-    console.log(request.action);
-    let enabled = request.action.includes("true");
-    let tab = await getCurrentTab();
-    if (!tab || !tab.url) return;
-
-    let vid = "blacklist_"+getVideoID(tab.url); 
-    console.assert(vid);
-
-    if (enabled) await chrome.storage.local.set   ({[vid]:true});
-    else         await chrome.storage.local.remove( [vid]);    
-
-    await printStorage("blacklist_");
-  }
-});
-
-chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
-  if (!changeInfo.url) return;      
-  console.assert(changeInfo.url);
-  embedPlayer(tab.id, changeInfo.url);
-});
-
-chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-  if (request.action === "youtubeTabUpdate") {
-    let tab = await getCurrentTab();
-    if (!tab || !tab.url) return;
-    embedPlayer(tab.id, tab.url);
-  }
-});
-
-chrome.tabs.onUpdated.addListener(onTabUpdate);
-chrome.tabs.onActivated.addListener(onTabUpdate);
-
-async function onTabUpdate() { }
-
-
-// Get the current active tab in the lastly focused window
-async function getCurrentTab() {
-  let [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
-  console.assert(tab);
-  return tab;
-}
-
-async function printStorage(arg) {
-  chrome.storage.local.get(null).then(result => {
-    for (var key in result) 
-      if (key.includes(arg)) {
-        console.log(key + ": " + result[key]);
-      }
-  });
-}
