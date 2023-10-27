@@ -18,13 +18,13 @@ import { Content } from './types.js';
 
 // function declerations
 async function initiateUrlDetection() {
-    chrome.runtime.onMessage.addListener(async (message) => {
+    chrome.runtime.onMessage.addListener(async (message, sender) => {
         if (message.command === "MANAGE_ME") {
 
             console.log(message);
             
             if (message.content === Content.Video) {
-                getCurrentTab().then(pushToEmbed);
+                pushToEmbed(sender.tab);
             }
         }
     });
@@ -52,7 +52,7 @@ async function pushToEmbed(tab) {
     const url = tab.url;
     
     try {
-        // we have to go back first, as youtube openend to site faster than us
+        // we have to go back first, as youtube openend the site faster than us
         await chrome.tabs.goBack(tab.id); 
     }
     catch (e) { 

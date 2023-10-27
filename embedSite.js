@@ -1,5 +1,8 @@
 
 
+/* TODO
+    This has to be ported to the new website partitioning system.
+*/
 
 let startedPlay = false;
 
