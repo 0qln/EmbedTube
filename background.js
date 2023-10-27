@@ -16,14 +16,15 @@ import { initBlacklist } from './blacklist.js';
 (async () => {
 
     await initBlacklist();
-
-    initiateUrlDetection();
+    await initiateUrlDetection();
     
 })();
 
 
 // function declerations
 async function initiateUrlDetection() {
+    
+    // On request, manage the tab according to it's content and platform
     chrome.runtime.onMessage.addListener(async (message, sender) => {
         if (message.command === "MANAGE_ME") {
 
@@ -43,6 +44,8 @@ async function initiateUrlDetection() {
             }
         }
     });
+
+    // Notify a tab when it's URL changed
     chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         if (changeInfo.url && isAnyYT(changeInfo.url)) {
             try {
@@ -81,6 +84,22 @@ async function switchPlayer(tab, urlCreator) {
 
 
 // testing
+
+async function test_blacklist() {
+    console.log("START test_blacklist");
+
+    await setBlacklisted('testId', true);
+    let result = getBlacklisted('testId');
+
+    console.log(result === true 
+        ? "Blacklist test succesful." 
+        : "Blacklist test failed.\n " + 
+            "Result: " + result +
+            "Expected result: " + true);
+
+    console.log("EXIT test_contentScripts");
+}
+
 async function test_contentScripts() {
     console.log("START test_contentScripts");
 
