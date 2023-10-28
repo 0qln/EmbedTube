@@ -77,7 +77,8 @@
     "resources": [
       "utils.js", 
       "types.js",
-      "blacklist.js"
+      "blacklist.js",
+      "settings.js"
     ]
   }]
 }
