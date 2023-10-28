@@ -116,6 +116,10 @@ async function switchPlayer(tab, urlCreator) {
 
 // testing
 
+async function test_messaging() {
+    // TODO
+}
+
 async function test_blacklist() {
     console.log("START test_blacklist");
 
