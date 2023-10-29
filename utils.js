@@ -1,9 +1,8 @@
 
 
 export async function notifyLoaded(name) {    
-    const loadedMessage =  "CONTENT_SCRIPT_LOADED " + name;
-    chrome.runtime.sendMessage(loadedMessage);
-    console.log(loadedMessage);
+    chrome.runtime.sendMessage({ command: "NOTIFY_LOADED", comment: name });
+    console.log(name);
 }
 
 export function isAnyYT(url) {
@@ -79,4 +78,12 @@ export async function MANAGE_ME(comment, content, platform, url) {
         platform: platform, 
         url: url
     });
+}
+
+
+export function test_success(testName) {
+    console.log('%c '+testName+' SUCCESSFUL', 'color: #00FF00');
+}
+export function test_fail(testName) {    
+    console.log('%c '+testName+' FAILED', 'color: #FF0000');
 }

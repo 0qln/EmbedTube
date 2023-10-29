@@ -14,50 +14,6 @@
       "matches": ["https://*.youtube.com/*"],
       "js": ["./allContent.js"],
       "run_at": "document_start"
-    },
-
-
-    {
-      "matches": ["https://www.youtube.com/embed/*"],
-      "js": ["./Embed/Video.js"]
-    },
-
-
-    {
-      "matches": ["https://www.youtube.com/"],
-      "js": ["./Youtube/Home.js"]
-    },
-    {
-      "matches": ["https://www.youtube.com/playlist*"],
-      "js": ["./Youtube/Playlist.js"]
-    },
-    {
-      "matches": ["https://www.youtube.com/watch*"],
-      "exclude_matches": ["https://www.youtube.com/watch*&list=*"],
-      "js": ["./Youtube/Video.js"]
-    },
-    {
-      "matches": ["https://www.youtube.com/watch*&list=*"],
-      "js": ["./Youtube/PlaylistPlayer.js"]
-    },
-
-
-    {
-      "matches": ["https://music.youtube.com/"],
-      "js": ["./YoutubeMusic/Home.js"]
-    },
-    {
-      "matches": ["https://music.youtube.com/playlist*"],
-      "js": ["./YoutubeMusic/Playlist.js"]
-    },
-    {
-      "matches": ["https://music.youtube.com/watch*"],
-      "exclude_matches": ["https://music.youtube.com/watch*&list=*"],
-      "js": ["./YoutubeMusic/Video.js"]
-    },
-    {
-      "matches": ["https://music.youtube.com/watch*&list=*"],
-      "js": ["./YoutubeMusic/PlaylistPlayer.js"]
     }
 
   ],
@@ -78,7 +34,19 @@
       "utils.js", 
       "types.js",
       "blacklist.js",
-      "settings.js"
+      "settings.js",
+      
+      "Managers/Youtube/Embed.js",
+      "Managers/Youtube/Video.js",
+      "Managers/Youtube/Playlist.js",
+      "Managers/Youtube/Other.js",
+      "Managers/Youtube/PlaylistPlayer.js",
+      
+      "Managers/Music/Video.js",
+      "Managers/Music/Playlist.js",
+      "Managers/Music/Other.js",
+      "Managers/Music/PlaylistPlayer.js"
+
     ]
   }]
 }

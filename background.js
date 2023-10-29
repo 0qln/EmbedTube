@@ -9,16 +9,21 @@ import { Content } from './types.js';
 import { getBlacklisted } from './blacklist.js';
 import { setBlacklisted } from './blacklist.js';
 import { initBlacklist } from './blacklist.js';
+import { initSettings } from './settings.js';
+import { test_fail } from './utils.js';
+import { test_success} from './utils.js';
 
 
 
 // main code
 (async () => {
 
+    // initiations
     await initBlacklist();
+    await initSettings();
     await initiateUrlDetection();
 
-    await test_blacklist();
+    // testing
 })();
 
 
@@ -29,27 +34,45 @@ async function initiateUrlDetection() {
 
     async function process(message, sender) {
         processing = true;
-
-        const videoId = extractVideoID(message.url);
-
-        if (message.comment === "OPEN_IN_YT") {
-            await setBlacklisted(videoId, true);
-        }
-
-        if (message.comment === "GO_EMBED" && await getBlacklisted(videoId) === false) {
-            await switchPlayer(sender.tab, createEmbedURL);
-        }
         
-        if (message.comment === "NOT_PLAYABLE") {
-            await setBlacklisted(videoId, true);
-            await switchPlayer(sender.tab, createWatchURL);
-        }       
+        
+        // We manage the tab's behaviour here, as content scripts
+        // do not update correctly on youtube sites. Because of that
+        // content scripts could not get removed or added at their targeting
+        // url, which could cause unexpected behaivour in the future.
+        console.log('manage');
+        switch (message.comment) {
+            case "OPEN_IN_YT":
+                console.log(message);
+                await setBlacklisted(extractVideoID(message.url), true);
+                break;
+
+            case "GO_EMBED":
+                if (await getBlacklisted(extractVideoID(message.url)) !== false) break;
+                console.log(message);
+                await switchPlayer(sender.tab, createEmbedURL);
+                break;
+
+            case "NOT_PLAYABLE":
+                console.log(message);
+                await setBlacklisted(extractVideoID(message.url), true);
+                await switchPlayer(sender.tab, createWatchURL);
+                break;
+        
+            default:
+                console.log(message);
+                break;
+        }
 
         // keep processing until there is no more to process
         while (msgQueue.length > 0) {
             let parameters = msgQueue.shift();
-            console.log('Message processed from stack: ');
-            console.log({ parameters:parameters.message, sender:parameters.sender});
+            //#region Debug message
+            if (false) {
+                console.log('Message processed from queue: ');
+                console.log({ message:parameters.message, sender:parameters.sender});
+            }
+            //#endregion
             await process(parameters.message, parameters.sender);
         }
 
@@ -63,13 +86,21 @@ async function initiateUrlDetection() {
     chrome.runtime.onMessage.addListener(async (message, sender) => {
         if (message.command === "MANAGE_ME") {
             if (processing) {
-                console.log('Message pushed to stack: ');
-                console.log({ message:message, sender:sender});
+                //#region Debug message
+                if (false) {
+                    console.log('Message pushed to queue: ');
+                    console.log({ message:message, sender:sender});
+                }
+                //#endregion
                 msgQueue.push({ message:message, sender:sender});
             }
             else {
-                console.log('Message processed immediatly: ');
-                console.log({ message:message, sender:sender});
+                //#region Debug message
+                if (false) {
+                    console.log('Message processed immediatly: ');
+                    console.log({ message:message, sender:sender});
+                }
+                //#endregion
                 process(message, sender);
             }            
         }
@@ -120,72 +151,64 @@ async function test_messaging() {
     // TODO
 }
 
+async function test_settings() {
+    console.log("START test_settings");
+
+    let expected = {
+        boolean: true,
+        integer: -1,
+        string: "some string",
+    };
+    await setBlacklisted('testBoolean', expected.boolean);
+    await setBlacklisted('testInteger', expected.integer);
+    await setBlacklisted('testString', expected.string);
+    let result = {
+        boolean: await getBlacklisted('testBoolean'),
+        integer: await getBlacklisted('testInteger'),
+        string: await getBlacklisted('testString'),
+    };
+
+    var iterations = 0, fails = 0;
+    for (var key in expected) {
+        console.log("Key: " + key);
+        console.log("Value: " + result[key]);
+        console.log("Expected: " + expected[key]);
+        if (result[key] === expected[key]) {
+            console.log("SUCCESS");
+        }
+        else {
+            console.log("FAIL");
+            fails++;
+        }
+        ++iterations;
+    }
+
+    if (fails === 0) {
+        test_success("test_settings");
+    }
+    else {
+        test_fail("test_settings");
+        console.log(fails  + "/" + iterations + " (fails/tests)");
+    }
+
+    console.log("EXIT test_settings");
+}
+
 async function test_blacklist() {
     console.log("START test_blacklist");
 
     await setBlacklisted('testId', true);
     let result = await getBlacklisted('testId');
 
-    console.log(result === true
-        ? "Blacklist test succesful."
-        : "Blacklist test failed." +
-        "\nResult: " + result +
-        "\nExpected result: " + true);
+    if (result === true) {
+        test_success("test_blacklist");
+    }
+    else {
+        test_fail("test_blacklist");
+        console.log("Result: " + result);
+        console.log("Expected: " + true);
+    }
 
     console.log("EXIT test_contentScripts");
-}
-
-async function test_contentScripts() {
-    console.log("START test_contentScripts");
-
-    const data = {};
-    let dataFinished = 0;
-    let dataCount = 0;
-    let tabs = [];
-    data.youtube = {
-        home: "https://www.youtube.com/",
-        playlist: "https://www.youtube.com/playlist?list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ",
-        video: "https://www.youtube.com/watch?v=Qd7QY_7jaOc",
-        playlistPlayer: "https://www.youtube.com/watch?v=Qd7QY_7jaOc&list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ&index=2"
-    };
-    data.youtubeMusic = {
-        home: "https://music.youtube.com/",
-        video: "https://music.youtube.com/watch?v=Qd7QY_7jaOc",
-        playlist: "https://music.youtube.com/playlist?list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ",
-        playlistPlayer: "https://music.youtube.com/watch?v=Qd7QY_7jaOc&list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ&index=2"
-    };
-    data.embed = {
-        video: "https://www.youtube.com/embed/Qd7QY_7jaOc",
-    };
-    data.rare = {
-        url: "https://www.youtube.com/watch?v=BQhJCS5IaaY&source_ve_path=Mjg2NjY&feature=emb_logo"
-    }
-
-    console.log("TESTING_DATA: ");
-    console.log(data);
-
-    chrome.runtime.onMessage.addListener(message => {
-        if (String(message).includes("CONTENT_SCRIPT_LOADED")) {
-            console.log(message);
-            dataFinished++;
-        }
-    });
-
-    for (var platform in data) {
-        for (var site in data[platform]) {
-            let url = data[platform][site];
-            chrome.tabs.create({ url: url }, tab => tabs.push(tab));
-            dataCount++;
-        }
-    }
-
-    while (dataFinished < dataCount) {
-        await new Promise(r => setTimeout(r, 100));
-        console.log("PROGRESS " + dataFinished + " / " + dataCount);
-    }
-    for (var tab in tabs) {
-        chrome.tabs.remove(tabs[tab].id);
-    }
-    console.log("test_contentScripts SUCCESS");
 }
 
