@@ -12,8 +12,8 @@
   "content_scripts": [
     {
       "matches": ["https://*.youtube.com/*"],
-      "js": ["./allContent.js"],
-      "run_at": "document_start"
+      "js": ["./Managers/allContent.js"],
+      "run_at": "document_idle"
     }
 
   ],
@@ -24,7 +24,7 @@
       "32": "assets/ext-icon.png"
     },
     "default_title": "Embedded Player",
-    "default_popup": "./Popup/popup.html"
+    "default_popup": "./GUI/Popup/popup.html"
   },
   "manifest_version": 3,
 

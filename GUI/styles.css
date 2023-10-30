@@ -4,8 +4,39 @@ body {
     text-align: center;
 }
 
+#settings-container {
+  display: flex;
+  align-self:first baseline;
+}
+
+#settings-options-list-container {
+  padding-right: 10px;
+  border-right: 2px solid;
+}
+#settings-option-display-container {
+  margin-left: 10px;
+}
+#settings-options-list {
+  list-style: none;
+}
+
+.settings-option-button {
+  background-color: transparent;
+  border-color: transparent;
+}
+.settings-option-button:hover {
+  background-color: #292a2d; 
+}
+.settings-option-text {
+  color: white;
+}
+
+#content-frame {
+  border-width: 0px;
+}
+
 hr {
-  width:100%;
+  width:auto;
 }
 
 .container {
