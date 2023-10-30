@@ -43,14 +43,14 @@ export function hasVideoID(url) {
     return !!extractVideoID(url);
 }
 export function extractPlaylistID(url) {
-    const regex = /(?:list=)(?<playlistID>[A-Za-z0-9_-]*)/gm;
-    const result = regex.exec(url);
-    return !result || result.length <= 1 ? null : result[1];
+    const regex = /[A-Za-z0-9_-]+(?<=list=[A-Za-z0-9_-]+)/gm;
+    const [result] = regex.exec(url);
+    return result ? result : null;
 }
 export function extractVideoID(url) {
-    const regex = /(?:\?v=|embed\/|&v=)(?<videoID>[A-Za-z0-9_-]*)/gm;
-    const result = regex.exec(url);
-    return !result || result.length <= 1 ? null : result[1];
+    const regex = /[A-Za-z0-9_-]+(?<=(watch\?v=|embed\/)[A-Za-z0-9_-]+)/gm;
+    const [result] = regex.exec(url);
+    return result ? result : null;
 }
 
 
