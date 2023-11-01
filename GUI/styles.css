@@ -1,20 +1,39 @@
 body {
     background-color: #202124;
     width: 300px;
+    height: 300px;
     text-align: center;
 }
 
+
+
+.container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
 #settings-container {
   display: flex;
+  width:auto;
   align-self:first baseline;
+  position: absolute;
+  top: 5%;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
-
 #settings-options-list-container {
   padding-right: 10px;
   border-right: 2px solid;
 }
 #settings-option-display-container {
   margin-left: 10px;
+}
+#content-frame {
+  height: 100%;
+  width: 80vw;
 }
 #settings-options-list {
   list-style: none;
@@ -48,7 +67,7 @@ hr {
 }
 
 h1 {
-    font-size: 18px;
+    font-size: 24px;
     margin-bottom: 10px;
     text-align: center;
 }

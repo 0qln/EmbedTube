@@ -9,6 +9,12 @@ export async function initBlacklist() {
 }
 
 
+export async function toggleBlacklisted(videoId) {
+    const value = await getBlacklisted(videoId);
+    setBlacklisted(videoId, !value);
+}
+
+
 export async function setBlacklisted(videoId, value) {
     await chrome.storage.local.get("blacklist").then(async result => {
         // Write value
@@ -22,12 +28,20 @@ export async function setBlacklisted(videoId, value) {
 
 
 export async function getBlacklisted(videoId) {    
-    var output = false;
-    await chrome.storage.local.get("blacklist").then(result => {
-        if (result.blacklist[videoId]) {
-            output = result.blacklist[videoId];
-        }
-    });
-    return output;
+    if (videoId) {
+        var output = false;
+        await chrome.storage.local.get("blacklist").then(result => {
+            if (result.blacklist[videoId]) {
+                output = result.blacklist[videoId];
+            }
+        });
+        return output;
+    }
+    else {
+        var output;
+        await chrome.storage.local.get("blacklist").then(result => {
+            output = result.blacklist ?? [ ];
+        });
+        return output;
+    }
 }
-

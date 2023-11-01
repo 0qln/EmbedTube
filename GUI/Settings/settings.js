@@ -7,10 +7,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     // add an link for every button to it's corresponding site
     for (let i = 0; i < options.length; i++) {
-        document.getElementById(options[i].id)
+        await document.getElementById(options[i].id)
         .addEventListener('click', event => {
             const [name] = /.*(?=-btn)/gm.exec(options[i].id);
             frame.src = `${name}/${name}.html`;
         });
     }
+
+    document.getElementById(options[0].id).click();
 });

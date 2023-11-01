@@ -42,15 +42,29 @@ export function hasPlaylistID(url) {
 export function hasVideoID(url) {
     return !!extractVideoID(url);
 }
+
+// checks if this could be a valid video id
+export function couldBeVideoID(id) {
+    // regex: 64bit Base64 encoded number
+    const result = /[0-9A-Za-z_-]{10}[048AEIMQUYcgkosw]/gm.exec(id);
+    return !result ? false : result[0] === id;
+}
+// checks if this could be a valid channel id
+export function couldBeChannelID(id) {
+    // regex: 128bit Base64 encoded number
+    const result = /[0-9A-Za-z_-]{21}[AQgw]/gm.exec(id);
+    return !result ? false : result[0] === id;
+}
+
 export function extractPlaylistID(url) {
     const regex = /[A-Za-z0-9_-]+(?<=list=[A-Za-z0-9_-]+)/gm;
-    const [result] = regex.exec(url);
-    return result ? result : null;
+    const result = regex.exec(url);
+    return result ? result[0] : null;
 }
 export function extractVideoID(url) {
     const regex = /[A-Za-z0-9_-]+(?<=(watch\?v=|embed\/)[A-Za-z0-9_-]+)/gm;
-    const [result] = regex.exec(url);
-    return result ? result : null;
+    const result = regex.exec(url);
+    return result ? result[0] : null;
 }
 
 
