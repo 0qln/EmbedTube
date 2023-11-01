@@ -5,7 +5,14 @@ body {
     text-align: center;
 }
 
-
+button {
+  background-color: transparent;
+  border-color: transparent;
+  color: white;
+}
+button:hover {
+  background-color: #393a3d;
+}
 
 .container {
   position: absolute;
@@ -23,6 +30,7 @@ body {
   right: 0;
   bottom: 0;
   left: 0;
+  margin-top: 15px;
 }
 #settings-options-list-container {
   padding-right: 10px;
