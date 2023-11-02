@@ -1,8 +1,6 @@
 
 # EmbedTube
 	A chrome extension that uses an embedded player to show youtube videos.
-Why?
-	This can have various benefits, one of which being that there are no ads in embedded players.
 
 # Installation
 1. Download any  `.zip`  release and unpack it. (latest release is always recommended.)
