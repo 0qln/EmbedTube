@@ -9,13 +9,11 @@
     chrome.runtime.onMessage.addListener(
         async ({command}) => command === "FORCE_UPDATE_URL" 
         && await update() 
-        && await newSite()); 
-        
+        && await newSite());         
 
-    await update();
+    await update(); 
     await newSite();
     utils.notifyLoaded(scriptIdentity);
-
 
 
     async function newSite() {        
@@ -25,16 +23,20 @@
         var comment = await manager.manage(document);
         console.log(comment);
         utils.MANAGE_ME(comment, content, platform, url);
+        
         return true;
     }
     
     async function update() {
         url = location.href;
 
-        content = utils.isVideo(url) ? types.Content.Video
+        // Order of operations is important here:
+        // First check if it is a playlist player, because `isVideo` also
+        // evaluates to true of a playlist player (not a bug).
+        content = utils.isPlaylistPlayer(url) ? types.Content.PlaylistPlayer
+                : utils.isVideo(url) ? types.Content.Video
                 : utils.isPlaylist(url) ? types.Content.Playlist
                 : utils.isEmbed(url) ? types.Content.Embed
-                : utils.isPlaylistPlayer(url) ? types.Content.PlaylistPlayer
                 : types.Content.Other;
 
         platform= utils.isYT(url) ? types.Platform.Youtube

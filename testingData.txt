@@ -38,4 +38,4 @@ const testingData = {
 
 
 
-// TODO: clip
+// TODO: clip url

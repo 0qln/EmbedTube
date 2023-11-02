@@ -40,12 +40,11 @@ async function initiateUrlDetection() {
         // do not update correctly on youtube sites. Because of that
         // content scripts could not get removed or added at their targeting
         // url, which could cause unexpected behaivour in the future.
-        console.log('manage');
+        console.log('Manage');
         switch (message.comment) {
             case "OPEN_IN_YT":
                 console.log(message);
                 await setBlacklisted(extractVideoID(message.url), true);
-                await switchPlayer(sender.tab, createWatchURL);
                 break;
 
             case "GO_EMBED":

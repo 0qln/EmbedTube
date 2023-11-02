@@ -18,7 +18,13 @@ async function initiateBlacklistSwitch() {
     // set
     blacklistSwitch().addEventListener("click", async function(event) {
         const id = extractVideoID((await getCurrentTab()).url);
-        setBlacklisted(id, blacklistSwitch().checked);
+        await setBlacklisted(id, blacklistSwitch().checked);
+        if (blacklistSwitch().checked === true) {
+            // TODO: switch to watch player
+        }
+        else {
+            // TODO: switch to embed player
+        }
     });
 }
 

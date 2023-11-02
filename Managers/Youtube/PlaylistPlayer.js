@@ -4,6 +4,13 @@ export async function manage(document) {
     const scriptIdentity = { Platform: types.Platform.Youtube, Content: types.Content.PlaylistPlayer };
     
 
+    // aquire all videos of the playlist
+
+
     utils.notifyLoaded(scriptIdentity);
 }
 
+
+async function push(document, videoId) {
+
+}
