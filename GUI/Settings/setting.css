@@ -4,6 +4,10 @@ body {
     padding: 0;
 }
 
+.option-container {
+    margin: 20px;
+}
+
 h1 {
     color: white;
     font-size: 24px;
@@ -18,5 +22,5 @@ h2 {
 .infoText {
     color: #e8eaed;
     font-size: 14px;
-    text-align: center;
+    text-align: left;
 }

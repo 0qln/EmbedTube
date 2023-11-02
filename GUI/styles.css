@@ -1,15 +1,9 @@
-body {
-    background-color: #202124;
-    width: 300px;
-    height: 300px;
-    text-align: center;
-}
-
 button {
   background-color: transparent;
   border-color: transparent;
   color: white;
 }
+
 button:hover {
   background-color: #393a3d;
 }
@@ -74,30 +68,11 @@ hr {
     margin: 20px;
 }
 
-h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
 .infoText {
     color: #e8eaed;
     font-size: 14px;
-    text-align: center;
-}
-
-
-.listHeader {
-    color: #e8eaed;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-}
-.listOption {
-    color: #e8eaed;
-    font-size: 14px;
     text-align: left;
-    align-self: left;
+    width: auto;
 }
 
 .switch-container {

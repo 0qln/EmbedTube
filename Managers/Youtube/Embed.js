@@ -26,7 +26,7 @@ export async function manage(document) {
     }
     
     if (await settings.getSettingsOption("autoplay") === true) {
-        await autoPlay(document);    
+        await autoPlay(document); 
     }
 
     return output;
@@ -40,16 +40,19 @@ function isPlayable(document) {
 
 // testing required
 function hasStarted(document) {
-    const elements = document.getElementsByClassName('ytp-upnext ytp-player-content ytp-upnext-autoplay-paused');
-    return elements.length !== 0;
+    const [bgImage] = document.getElementsByClassName("ytp-cued-thumbnail-overlay");
+    return bgImage.style.display === "none";
 }
 
-// testing required
 async function autoPlay(document, maxTries = 20) {
-    const [startButton] = document.getElementsByClassName("ytp-large-play-button ytp-button ytp-large-play-button-red-bg");
+    function startButton() { 
+        return document.getElementsByClassName("ytp-large-play-button ytp-button ytp-large-play-button-red-bg")[0]; 
+    }
+
     while (hasStarted(document) === false && --maxTries > 0) {
-        startButton.click();
+        startButton().click();
         await new Promise(r => setTimeout(r, 100));
     }
-    console.log("Auto play success: " + maxTries === 0);
+    
+    console.log("Auto play success: " + (maxTries > 0));
 }

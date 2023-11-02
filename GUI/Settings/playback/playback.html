@@ -1,10 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Playback</title>
     <link rel="stylesheet" type="text/css" href="../setting.css">
+    <link rel="stylesheet" type="text/css" href="../../styles.css">
     <script type="module" src="playback.js"></script>
 </head>
 <body>
+
+    <h1>
+        Playback
+        <hr>
+    </h1>
+
+    <div class="option-container">
+        <h2>
+            Autoplay
+        </h2>
+        
+        <div id="autoplay-container">
+            <p class="infoText">
+                The embed player will start the video automatically, just like the default youtube player.
+            </p>
+            
+            <div>
+                <div class="switch-container">
+                    <span class="infoText switchInfo">Enable Autoplay</span>
+                    <label class="switch">
+                        <input type="checkbox" id="autoplay-switch">
+                        <span class="slider round"></span>
+                    </label>
+                </div>   
+            </div>     
+        </div>
+    </div>
 
 </body>
 </html>

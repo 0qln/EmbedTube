@@ -1,5 +1,4 @@
 import { getBlacklisted, toggleBlacklisted } from "../../../blacklist.js";
-import { setBlacklisted } from "../../../blacklist.js";
 import { couldBeVideoID, extractVideoID, hasVideoID } from "../../../utils.js";
 
 
