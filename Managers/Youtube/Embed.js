@@ -1,8 +1,10 @@
+
 export async function manage(document) {
     // imports
     const utils = await import(chrome.runtime.getURL('utils.js'));
     const types = await import(chrome.runtime.getURL('types.js'));
     const settings = await import(chrome.runtime.getURL('settings.js'));
+    const blacklist = await import(chrome.runtime.getURL('blacklist.js'));
 
     // vars
     let output = "";
@@ -17,6 +19,10 @@ export async function manage(document) {
 
     if (isPlayable(document) === false) {
         output = "NOT_PLAYABLE";
+    }
+    
+    if (await blacklist.getBlacklisted(utils.extractVideoID(location.href)) === true) {
+        output = "OPEN_IN_YT";
     }
     
     if (await settings.getSettingsOption("autoplay") === true) {

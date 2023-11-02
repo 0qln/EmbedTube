@@ -45,6 +45,7 @@ async function initiateUrlDetection() {
             case "OPEN_IN_YT":
                 console.log(message);
                 await setBlacklisted(extractVideoID(message.url), true);
+                await switchPlayer(sender.tab, createWatchURL);
                 break;
 
             case "GO_EMBED":

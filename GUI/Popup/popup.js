@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 async function initiateBlacklistSwitch() {    
     // get
     const value = await getBlacklisted(extractVideoID((await getCurrentTab()).url));
-    blacklistSwitch().checked = value ?? false;
+    blacklistSwitch().checked = value === true;
     // set
     blacklistSwitch().addEventListener("click", async function(event) {
         const id = extractVideoID((await getCurrentTab()).url);
