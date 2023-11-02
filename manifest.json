@@ -35,6 +35,7 @@
       "types.js",
       "blacklist.js",
       "settings.js",
+      "playlist.js",
       
       "Managers/Youtube/Embed.js",
       "Managers/Youtube/Video.js",

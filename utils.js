@@ -74,6 +74,9 @@ export function createEmbedURL(videoID) {
 export function createWatchURL(videoID) {
     return "https://www.youtube.com/watch?v=" + videoID;
 }
+export function createPlaylistURL(playlistID) {
+    return "https://www.youtube.com/playlist?list=" + playlistID;
+}
 
 
 // Get the current active tab in the lastly focused window

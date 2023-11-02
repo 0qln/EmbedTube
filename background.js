@@ -1,4 +1,4 @@
-import { createWatchURL, hasVideoID, isAnyYT, isVideo } from './utils.js'
+import { createPlaylistURL, createWatchURL, hasVideoID, isAnyYT, isVideo } from './utils.js'
 import { isPlaylistPlayer } from './utils.js';
 import { extractPlaylistID } from './utils.js'
 import { extractVideoID } from './utils.js';
@@ -12,6 +12,7 @@ import { initBlacklist } from './blacklist.js';
 import { initSettings } from './settings.js';
 import { test_fail } from './utils.js';
 import { test_success} from './utils.js';
+import { loadPlaylist } from './playlist.js';
 
 
 
@@ -21,16 +22,42 @@ import { test_success} from './utils.js';
     // initiations
     await initBlacklist();
     await initSettings();
-    await initiateUrlDetection();
+    await initManageHandler();
+    await initRequestHandler();
 
     // testing
 })();
 
 
+async function initRequestHandler() {
+
+    chrome.runtime.onMessage.addListener(async (message, sender) => {
+        if (message.command === "REQUEST") {
+            console.log(message);
+            switch (message.comment) {
+                case "VIDEO_IDS":
+                    chrome.tabs.create({ url:createPlaylistURL(message.playlistID) }, tab => {
+                        // notify user that fetching has begun
+                        // make user wait for videos to get fetched
+                        // maybe even start playing, once the first video has been fetched
+                        // fetching can be done under a content script, they get already loaded
+                        // on the correct urls, might aswell make use of that..
+                    });
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+    });
+
+}
+
+
 const msgQueue = [];
 var processing = false;
 // function declerations
-async function initiateUrlDetection() {
+async function initManageHandler() {
 
     async function process(message, sender) {
         processing = true;
