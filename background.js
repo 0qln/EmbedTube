@@ -111,7 +111,7 @@ async function initMiscHandler() {
                     let currentWindow = await getCurrentWindow();
                     await chrome.windows.update(sender.tab.windowId, { focused: true });
                     await new Promise(r => setTimeout(r, 10));
-                    await chrome.windows.update(currentWindow.id, { focused: true, alwaysOnTop:true });
+                    await chrome.windows.update(currentWindow.id, { focused: true });
                     break;
                 
             
