@@ -1,7 +1,8 @@
-
+export async function alert(message) {
+    // TODO: show a popup, similar to `window.alert`, but that does not pause the scripts
+}
 
 export async function notifyLoaded(name) {    
-    chrome.runtime.sendMessage({ command: "NOTIFY_LOADED", comment: name });
     console.log(name);
 }
 
@@ -82,8 +83,14 @@ export function createPlaylistURL(playlistID) {
 // Get the current active tab in the lastly focused window
 export async function getCurrentTab() {
     let [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
-    console.assert(tab);
+    console.assert(tab); // this fails only while debugging and connection issues
     return tab;
+}
+// Get the current focued window
+export async function getCurrentWindow() {
+    let window = await chrome.windows.getCurrent();
+    console.assert(window); 
+    return window;
 }
 
 // using this so the masseges, when printed have a uniform order of properties

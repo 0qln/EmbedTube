@@ -2,26 +2,76 @@
     const scriptIdentity = "AllContent";
     const utils = await import(chrome.runtime.getURL('utils.js'));
     const types = await import(chrome.runtime.getURL('types.js'));
+    utils.notifyLoaded(scriptIdentity);
     
     var platform, content, url;
 
     
+    // chrome.runtime.onMessage.addListener(
+    //     async message => {
+    //         if (message.command === "REQUEST") {                
+    //             console.log('received some request in content script');                
+    //             switch (message.comment) {
+    //                 case "VIDEO_IDS":                        
+    //                     console.log('received VIDEO_IDS request in content script');
+    //                     if (content !== types.Content.Playlist) {
+    //                         console.log("Error: Video IDs were requested from a tab that containes no playlist!");
+    //                         break;
+    //                     }
+
+    //                     // aquire video ids
+    //                     const managerScript = `Managers/${platform}/${content}.js`;
+    //                     const manager = await import(chrome.runtime.getURL(managerScript));
+    //                     const videoIDs = await manager.getVideoIDs(document, window); 
+
+    //                     // send the video ids back
+    //                     chrome.runtime.sendMessage({ command: "REQUST_RESPONSE", comment:message.comment, value:videoIDs });
+    //                     break;
+                    
+    //                 default:
+    //                     break;
+    //                 }
+    //         }
+    //     }
+    // );
+
     chrome.runtime.onMessage.addListener(
-        async ({command}) => command === "FORCE_UPDATE_URL" 
-        && await update() 
-        && await newSite());         
+        async message => {
+            if (message.command === "MISC") {                
+                switch (message.comment) {
+                    case "DUMP_VIDEO_IDS":
+                        // tell tab to start fetching
+                        const managerScript = `Managers/${platform}/${content}.js`;
+                        const manager = await import(chrome.runtime.getURL(managerScript));
+                        manager.fetchVideoIDs(document, window); 
+                        break;
+                
+                    default:
+                        break;
+                }
+            }
+        }
+    )
 
-    await update(); 
+
+    chrome.runtime.onMessage.addListener(
+        async message => {
+            if (message.command === "FORCE_UPDATE_URL") {
+                await update();
+                await newSite();
+            }
+        }
+    );         
+    await update();
     await newSite();
-    utils.notifyLoaded(scriptIdentity);
-
 
     async function newSite() {        
+        console.log("`newSite`");
+
         var managerScript = `Managers/${platform}/${content}.js`;
         var manager = await import(chrome.runtime.getURL(managerScript));
         
-        var comment = await manager.manage(document);
-        console.log(comment);
+        var comment = await manager.manage(document, window);
         utils.MANAGE_ME(comment, content, platform, url);
         
         return true;

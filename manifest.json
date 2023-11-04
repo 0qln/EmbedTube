@@ -2,7 +2,15 @@
   "name": "Embed Tube",
   "version": "3.0.0",
   "description": "Open youtube videos with an embedding player",
-  "permissions": ["storage", "tabs", "activeTab", "scripting", "background", "tabCapture"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "background",
+    "tabCapture",
+    "webRequest"
+  ],
   "host_permissions": ["https://*.youtube.com/*"],
   "background": {
     "service_worker": "background.js",
