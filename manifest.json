@@ -1,26 +1,29 @@
 {
   "name": "Embed Tube",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "Open youtube videos with an embedding player",
-  "permissions": ["storage", "tabs", "activeTab", "scripting", "background"],
-  "host_permissions": ["https://www.youtube.com/*"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "background",
+    "tabCapture",
+    "webRequest"
+  ],
+  "host_permissions": ["https://*.youtube.com/*"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
   },
+  "minimum_chrome_version": "92",
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["contentScript.js"]
-    },
-    {
-      "matches": ["https://www.youtube.com/embed/*"],
-      "js": ["embedSite.js"],
-      "run_at": "document_start"
-    },
-    {
-      "matches": ["<all_urls>"],
-      "js": ["tabUpdate.js"]
+      "matches": ["https://*.youtube.com/*"],
+      "js": ["./Managers/allContent.js"],
+      "run_at": "document_idle"
     }
+
   ],
   "action": {
     "default_icon": {
@@ -29,7 +32,30 @@
       "32": "assets/ext-icon.png"
     },
     "default_title": "Embedded Player",
-    "default_popup": "popup.html"
+    "default_popup": "./GUI/Popup/popup.html"
   },
-  "manifest_version": 3
+  "manifest_version": 3,
+
+  "web_accessible_resources": [{
+    "matches": ["<all_urls>"],
+    "resources": [
+      "utils.js", 
+      "types.js",
+      "blacklist.js",
+      "settings.js",
+      "playlist.js",
+      
+      "Managers/Youtube/Embed.js",
+      "Managers/Youtube/Video.js",
+      "Managers/Youtube/Playlist.js",
+      "Managers/Youtube/Other.js",
+      "Managers/Youtube/PlaylistPlayer.js",
+      
+      "Managers/Music/Video.js",
+      "Managers/Music/Playlist.js",
+      "Managers/Music/Other.js",
+      "Managers/Music/PlaylistPlayer.js"
+
+    ]
+  }]
 }

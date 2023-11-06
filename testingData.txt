@@ -1,0 +1,41 @@
+const testingData = {
+    // platforms
+    Youtube : {
+        // contents
+        Other: [
+            // testing urls
+            "https://www.youtube.com/"
+        ],
+        Playlist: [
+            "https://www.youtube.com/playlist?list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ"
+        ],            
+        Video: [
+            "https://www.youtube.com/watch?v=Qd7QY_7jaOc"
+        ],
+        PlaylistPlayer: [
+            "https://www.youtube.com/watch?v=Qd7QY_7jaOc&list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ&index=2"
+        ],
+        Embed: [
+            "https://www.youtube.com/watch?v=BQhJCS5IaaY&source_ve_path=Mjg2NjY&feature=emb_logo",
+            "https://www.youtube.com/embed/Qd7QY_7jaOc"
+        ]
+    },
+    Music: {
+        Other: [
+            "https://music.youtube.com/"
+        ],
+        Video: [
+            "https://music.youtube.com/watch?v=Qd7QY_7jaOc"
+        ],
+        Playlist: [
+            "https://music.youtube.com/playlist?list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ"
+        ],
+        PlaylistPlayer: [
+            "https://music.youtube.com/watch?v=Qd7QY_7jaOc&list=PLlfOcCY7-RxxAGKtjCtiv4vZs_DnlVvNZ&index=2"
+        ]
+    }
+};
+
+
+
+// TODO: clip url

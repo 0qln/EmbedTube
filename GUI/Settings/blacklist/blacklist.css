@@ -1,0 +1,31 @@
+#sites-list {
+    list-style: none;
+}
+
+.list-entry-text {
+    font-size: 16px;
+    color: white;
+    margin-left: 15px;
+}
+
+.list-entry-remove-icon {
+    color: gray;
+    font-size: 14px;
+    cursor: pointer; 
+    background-color: transparent;
+    border: transparent;
+}
+
+.list-entry-container {
+    display: flex;
+    width: auto;
+    align-self: baseline;
+}
+
+.list-entry-container:hover .list-entry-remove-icon {
+    color: white;
+}
+
+.list-entry-container:hover {
+    background-color: #202124;
+}
