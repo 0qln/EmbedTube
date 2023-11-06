@@ -11,37 +11,61 @@ export async function initBlacklist() {
 
 export async function toggleBlacklisted(videoId) {
     const value = await getBlacklisted(videoId);
-    setBlacklisted(videoId, !value);
+    await setBlacklisted(videoId, !value);
 }
 
 
 export async function setBlacklisted(videoId, value) {
-    await chrome.storage.local.get("blacklist").then(async result => {
-        // Write value
-        result.blacklist[videoId] = value;
+    // retrieve blacklist from the storage    
+    const result = await new Promise((resolve, reject) => {
+        chrome.storage.local.get("blacklist", result => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result);
+            }
+        });
+    });
 
-        // Important: `result` is a copy of the data in storage. Thus 
-        // we have to save the data explicitly.
-        await chrome.storage.local.set({ "blacklist": result.blacklist });
+    // change the value of the entry
+    result.blacklist[videoId] = value;
+
+    // push the new blacklist back onto the storage    
+    await new Promise((resolve, reject) => {
+        chrome.storage.local.set({ "blacklist": result.blacklist }, () => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve();
+            }
+        });
     });
 }
 
 
 export async function getBlacklisted(videoId) {    
+    // return `video`Id
     if (videoId) {
-        var output = false;
-        await chrome.storage.local.get("blacklist").then(result => {
-            if (result.blacklist[videoId]) {
-                output = result.blacklist[videoId];
-            }
-        });
-        return output;
+        return await new Promise((resolve, reject) => {
+            chrome.storage.local.get("blacklist", result => {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(result.blacklist[videoId] ?? false);
+                }
+            })
+        })
     }
+    // return all
     else {
-        var output;
-        await chrome.storage.local.get("blacklist").then(result => {
-            output = result.blacklist ?? [ ];
-        });
-        return output;
+        return await new Promise((resolve, reject) => {
+            chrome.storage.local.get("blacklist", result => {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(result.blacklist);
+                }
+            })
+        })
     }
 }
