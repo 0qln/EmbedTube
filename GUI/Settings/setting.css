@@ -17,10 +17,15 @@ h2 {
     color: white;
     font-size: 18px;
     text-align: left;
+    margin-top: 40px;
 }
 
 .infoText {
     color: #e8eaed;
     font-size: 14px;
     text-align: left;
+}
+
+.settingInfo {
+    margin-top: 30px;
 }

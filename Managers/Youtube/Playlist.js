@@ -25,7 +25,7 @@ export async function fetchVideoIDs(document, window) {
         window.scrollBy(0, 100000);
         await chrome.runtime.sendMessage({ command:"MISC", comment:"WIGGLE_WINDOW" });
         videos = fetchVideos(document);
-        await new Promise(r => setTimeout(r, 700));
+        await new Promise(r => setTimeout(r, 2000));
     }
     //window.scrollTo(0,0);
     

@@ -17,9 +17,8 @@
         <h2>
             Autoplay
         </h2>
-        
         <div id="autoplay-container">
-            <p class="infoText">
+            <p class="infoText settingInfo">
                 The embed player will start the video automatically, just like the default youtube player.
             </p>
             
@@ -33,6 +32,39 @@
                 </div>   
             </div>     
         </div>
+
+        <h2>
+            Playlists
+        </h2>
+        <div id="playlists-container">
+            <p class="infoText settingInfo">
+                When Embedtube detects the browser to be focused on a playlist, it will start fetching the videos out of that playlist. This is neccesary for playlist playback.
+            </p>
+            <div>
+                <div class="switch-container">
+                    <span class="infoText switchInfo">Enable playlist fetching</span>
+                    <label class="switch">
+                        <input type="checkbox" id="playlist-fetching-switch">
+                        <span class="slider round"></span>
+                    </label>
+                </div>   
+            </div>     
+            <p class="infoText settingInfo">
+                If this is enabled, videos from a playlist will be played via an embed player. 
+            </p>
+            <div>
+                <div class="switch-container">
+                    <span class="infoText switchInfo">Enable playlist playback via embed player</span>
+                    <label class="switch">
+                        <input type="checkbox" id="playlist-playback-switch">
+                        <span class="slider round"></span>
+                    </label>
+                </div>   
+            </div>
+        </div>
+
+
+
     </div>
 
 </body>
