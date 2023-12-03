@@ -2,11 +2,13 @@ export async function manage(document, window) {
     const utils = await import(chrome.runtime.getURL('utils.js'));
     const types = await import(chrome.runtime.getURL('types.js'));
     const playlist = await import(chrome.runtime.getURL('playlist.js'));
+    const settings = await import(chrome.runtime.getURL('settings.js'));
     const scriptIdentity = { Platform: types.Platform.Youtube, Content: types.Content.Playlist };
     utils.notifyLoaded(scriptIdentity);
     
-    
-    playlist.startPrefetching(utils.extractPlaylistID(document.location.href));
+    if (await settings.getSettingsOption("playlist-prefetching") === true) {
+        playlist.startPrefetching(utils.extractPlaylistID(document.location.href));
+    } 
 }
 
 export async function fetchVideoIDs(document, window) {
